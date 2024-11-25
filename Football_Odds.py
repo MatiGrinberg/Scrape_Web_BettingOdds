@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 chrome_options = Options()
 chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
@@ -131,30 +132,27 @@ avg_ret = (
     .assign(avg=lambda x: x['sum'] / x['count'])  
 )
 
-def scatter_avg_count(data, title, color):
-    plt.figure(figsize=(8, 5))
-    plt.scatter(data['count'], data['avg'], color=color, alpha=0.7)
-    plt.title(title)
-    plt.xlabel('Count')
-    plt.ylabel('Average Return')
-    plt.grid(True)
-    plt.show()
 
+print(os.getcwd())
 small_count = avg_ret[avg_ret['count'] <= 10]
 large_count = avg_ret[avg_ret['count'] > 10]
 
-scatter_avg_count(small_count, 'Scatter Plot for Count ≤ 10', 'blue')
-scatter_avg_count(large_count, 'Scatter Plot for Count > 10', 'orange')
-scatter_avg_count(avg_ret, 'Scatter Plot for Count All', 'red')
+def scatter_avg_count(data, title, color):
+    plt.figure(figsize=(8, 5))
+    plt.scatter(data['count'], data['avg'], color=color, alpha=0.7, label='Data Points')
+    avg_of_avg = data['avg'].mean()  # Calculate the average of the 'avg' column
+    plt.axhline(avg_of_avg, color='gray', linestyle='--', label=f'Avg Avg: {avg_of_avg:.2f}')  # Add a horizontal line
+    plt.title(title)
+    plt.xlabel('Count')
+    plt.ylabel('Average Return')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig(f"{title.replace(' ', '_')}.png")  
+    plt.show()
 
-
-
-averages = round(avg_ret['avg'],2)
-print(averages.mean())
-averages[averages<1].hist(bins=100)
-averages[averages>=1].hist(bins=100)
-
-
+scatter_avg_count(small_count, 'Plot Count_Bets ≤ 10', 'blue')
+scatter_avg_count(large_count, 'Plot Count_Bets > 10', 'orange')
+scatter_avg_count(avg_ret, 'Plot Count_Bets All', 'red')
 
 
 
